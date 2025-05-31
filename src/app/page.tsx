@@ -1,9 +1,11 @@
 'use client'
 import { useState } from 'react'
 import SignUpForm from '@/components/SignUpForm'
+import LoginForm from '@/components/LoginForm'
 
 export default function Home() {
   const [showSignUp, setShowSignUp] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
 
   return (
     <div style={{ 
@@ -60,17 +62,20 @@ export default function Home() {
         >
           SIGN UP
         </button>
-        <button style={{ 
-          border: '1px solid #a8a29e', 
-          backgroundColor: 'white', 
-          color: '#44403c',
-          padding: '12px 32px', 
-          fontSize: '14px', 
-          width: '192px',
-          fontFamily: 'monospace',
-          fontWeight: '500',
-          cursor: 'pointer'
-        }}>
+        <button 
+          onClick={() => setShowLogin(true)}
+          style={{ 
+            border: '1px solid #a8a29e', 
+            backgroundColor: 'white', 
+            color: '#44403c',
+            padding: '12px 32px', 
+            fontSize: '14px', 
+            width: '192px',
+            fontFamily: 'monospace',
+            fontWeight: '500',
+            cursor: 'pointer'
+          }}
+        >
           LOG IN
         </button>
       </div>
@@ -105,6 +110,9 @@ export default function Home() {
 
       {/* Sign Up Form */}
       {showSignUp && <SignUpForm onClose={() => setShowSignUp(false)} />}
+
+      {/* Login Form */}
+      {showLogin && <LoginForm onClose={() => setShowLogin(false)} />}
     </div>
   );
 }
