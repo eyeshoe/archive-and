@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
-import AddMediaForm from '@/components/AddMediaForm'
+import { AddMediaForm } from '@/components/media/AddMediaForm'
 
 interface UserSite {
   id: string
