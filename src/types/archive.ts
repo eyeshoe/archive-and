@@ -19,6 +19,8 @@ export interface UserSite {
     completed: boolean
     added_date: string
     completed_date: string
+    is_public: boolean
+    notes_public?: boolean
   }
   
   export interface Theme {

@@ -70,7 +70,7 @@ export function ArchivePage({ mediaItems, theme, onItemClick }: ArchivePageProps
       </h2>
       
       <div style={{ fontSize: '14px', color: '#a8a29e', marginBottom: '32px' }}>
-        {mediaItems.length} items chronologically
+        {mediaItems.length} items 
       </div>
 
       {Object.entries(groupedItems).map(([monthYear, items]) => (
@@ -200,10 +200,10 @@ export function ArchivePage({ mediaItems, theme, onItemClick }: ArchivePageProps
                     </span>
                     <div style={{ display: 'flex', gap: '12px' }}>
                       {item.completed && (
-                        <span style={{ color: '#a8a29e', fontSize: '11px' }}>✓ Completed</span>
+                        <span style={{ color: '#059669' }}>✓ Completed</span>
                       )}
                       {!item.is_public && (
-                        <span style={{ color: '#a8a29e', fontSize: '11px' }}>🔒 Private</span>
+                        <span style={{ color: '#dc2626' }}>🔒 Private</span>
                       )}
                     </div>
                   </div>

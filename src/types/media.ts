@@ -7,10 +7,11 @@ export interface CreateMediaItem {
     notes: string
     completed: boolean
     is_public: boolean
+    notes_public?: boolean
   }
   
   export interface MediaFormData extends CreateMediaItem {
-    // Form-specific fields can be added here if needed
+    notes_public: boolean
   }
   
   export const MEDIA_TYPES = [

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import type { Theme } from '@/types/archive' // Ensure this type is defined in the specified path
-import type { CreateMediaItem } from '@/types/media' // Ensure this type is defined in the specified path
-import { AddMediaForm } from '@/components/media/AddMediaForm'
+import type { Theme } from '@/types/archive'
+import type { CreateMediaItem } from '@/types/media'
+import { AddMediaForm } from './AddMediaForm'
 
 interface AddMediaModalProps {
   isOpen: boolean
@@ -69,8 +69,8 @@ export function AddMediaModal({ isOpen, onClose, theme, onSubmit }: AddMediaModa
           backgroundColor: 'white',
           border: `3px solid ${theme.main}`,
           borderRadius: '0',
-          padding: '32px',
-          maxWidth: '600px',
+          padding: '0',
+          maxWidth: '800px',
           width: '100%',
           maxHeight: '90vh',
           overflowY: 'auto',
@@ -80,20 +80,22 @@ export function AddMediaModal({ isOpen, onClose, theme, onSubmit }: AddMediaModa
       >
         {/* Modal Header */}
         <div style={{
+          backgroundColor: theme.main,
+          color: 'white',
+          padding: '24px 32px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '24px',
-          borderBottom: `2px solid ${theme.light}`,
-          paddingBottom: '16px'
+          borderBottom: `2px solid ${theme.main}`
         }}>
           <h2 style={{
             fontSize: '1.5rem',
             fontFamily: 'serif',
-            color: theme.main,
-            margin: '0'
+            margin: '0',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
           }}>
-            ADD MEDIA
+            Add Media
           </h2>
           <button
             onClick={onClose}
@@ -101,11 +103,12 @@ export function AddMediaModal({ isOpen, onClose, theme, onSubmit }: AddMediaModa
             style={{
               backgroundColor: 'transparent',
               border: 'none',
-              fontSize: '24px',
-              color: theme.main,
+              fontSize: '28px',
+              color: 'white',
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               padding: '0',
-              opacity: isSubmitting ? 0.6 : 1
+              opacity: isSubmitting ? 0.6 : 1,
+              lineHeight: '1'
             }}
           >
             ×
@@ -113,12 +116,14 @@ export function AddMediaModal({ isOpen, onClose, theme, onSubmit }: AddMediaModa
         </div>
 
         {/* Modal Content */}
-        <AddMediaForm
-          theme={theme}
-          onSubmit={handleSubmit}
-          onCancel={onClose}
-          isSubmitting={isSubmitting}
-        />
+        <div style={{ padding: '24px 40px 32px 40px' }}>
+          <AddMediaForm
+            theme={theme}
+            onSubmit={handleSubmit}
+            onCancel={onClose}
+            isSubmitting={isSubmitting}
+          />
+        </div>
       </div>
     </div>
   )
