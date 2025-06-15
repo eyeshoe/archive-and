@@ -2,7 +2,11 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-export default function SignUpForm({ onClose }: { onClose: () => void }) {
+interface SignUpFormProps {
+  onClose: () => void
+}
+
+export default function SignUpForm({ onClose }: SignUpFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
@@ -13,21 +17,28 @@ export default function SignUpForm({ onClose }: { onClose: () => void }) {
     e.preventDefault()
     setLoading(true)
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          username,
-          phone,
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            phone,
+          }
         }
-      }
-    })
+      })
 
-    if (error) {
-      alert(error.message)
-    } else {
-      alert('Check your email for confirmation!')
+      if (error) {
+        alert(error.message)
+        return
+      }
+
+      alert('Sign up successful! Please check your email to confirm your account.')
+      onClose()
+    } catch (error) {
+      console.error('Sign up error:', error)
+      alert('An error occurred during sign up')
     }
     setLoading(false)
   }
@@ -47,13 +58,22 @@ export default function SignUpForm({ onClose }: { onClose: () => void }) {
     }}>
       <div style={{
         backgroundColor: '#fafaf9',
-        padding: '2rem',
-        maxWidth: '400px',
-        width: '90%',
-        fontFamily: 'monospace'
+        padding: '3rem',
+        width: '420px',
+        maxWidth: '90vw',
+        fontFamily: 'monospace',
+        position: 'relative',
+        border: '2px solid #a8a29e'
       }}>
-        <h2 style={{ marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 'bold' }}>
-            sign up for archive&
+        {/* Title - Centered */}
+        <h2 style={{ 
+          marginBottom: '2rem', 
+          fontSize: '1.5rem', 
+          fontWeight: 'bold',
+          textAlign: 'center',
+          color: '#292524'
+        }}>
+          sign up for archive&
         </h2>
         
         <form onSubmit={handleSignUp}>
@@ -65,10 +85,13 @@ export default function SignUpForm({ onClose }: { onClose: () => void }) {
             required
             style={{
               width: '100%',
-              padding: '12px',
+              padding: '16px',
               marginBottom: '1rem',
-              border: '1px solid #a8a29e',
-              fontFamily: 'monospace'
+              border: '2px solid #a8a29e',
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              backgroundColor: 'white',
+              boxSizing: 'border-box'
             }}
           />
           
@@ -80,24 +103,30 @@ export default function SignUpForm({ onClose }: { onClose: () => void }) {
             required
             style={{
               width: '100%',
-              padding: '12px',
+              padding: '16px',
               marginBottom: '1rem',
-              border: '1px solid #a8a29e',
-              fontFamily: 'monospace'
+              border: '2px solid #a8a29e',
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              backgroundColor: 'white',
+              boxSizing: 'border-box'
             }}
           />
           
           <input
             type="tel"
-            placeholder="Phone"
+            placeholder="Phone (optional)"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             style={{
               width: '100%',
-              padding: '12px',
+              padding: '16px',
               marginBottom: '1rem',
-              border: '1px solid #a8a29e',
-              fontFamily: 'monospace'
+              border: '2px solid #a8a29e',
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              backgroundColor: 'white',
+              boxSizing: 'border-box'
             }}
           />
           
@@ -109,24 +138,33 @@ export default function SignUpForm({ onClose }: { onClose: () => void }) {
             required
             style={{
               width: '100%',
-              padding: '12px',
-              marginBottom: '1.5rem',
-              border: '1px solid #a8a29e',
-              fontFamily: 'monospace'
+              padding: '16px',
+              marginBottom: '2rem',
+              border: '2px solid #a8a29e',
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              backgroundColor: 'white',
+              boxSizing: 'border-box'
             }}
           />
           
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '12px',
+            justifyContent: 'center'
+          }}>
             <button
               type="submit"
               disabled={loading}
               style={{
                 backgroundColor: '#44403c',
                 color: 'white',
-                padding: '12px 24px',
+                padding: '16px 32px',
                 border: 'none',
                 fontFamily: 'monospace',
-                flex: 1
+                fontSize: '14px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1
               }}
             >
               {loading ? 'creating...' : 'create account'}
@@ -137,9 +175,12 @@ export default function SignUpForm({ onClose }: { onClose: () => void }) {
               onClick={onClose}
               style={{
                 backgroundColor: 'transparent',
-                border: '1px solid #a8a29e',
-                padding: '12px 24px',
-                fontFamily: 'monospace'
+                border: '2px solid #a8a29e',
+                padding: '16px 32px',
+                fontFamily: 'monospace',
+                fontSize: '14px',
+                cursor: 'pointer',
+                color: '#44403c'
               }}
             >
               cancel

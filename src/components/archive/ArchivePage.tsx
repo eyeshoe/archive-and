@@ -7,10 +7,13 @@ interface ArchivePageProps {
 }
 
 export function ArchivePage({ mediaItems, theme, onItemClick }: ArchivePageProps) {
-  // Group items by month/year for better organization
+  // Group items by month/year
   const groupedItems = mediaItems.reduce((acc, item) => {
     const date = new Date(item.added_date)
-    const monthYear = `${date.toLocaleDateString('en-US', { month: 'long' })} ${date.getFullYear()}`
+    const monthYear = date.toLocaleDateString('en-US', { 
+      month: 'long', 
+      year: 'numeric' 
+    })
     
     if (!acc[monthYear]) {
       acc[monthYear] = []
@@ -24,18 +27,8 @@ export function ArchivePage({ mediaItems, theme, onItemClick }: ArchivePageProps
       case 'book': return '#c08a8a'        // Main dusty rose
       case 'music': return '#a67373'       // Deeper dusty rose
       case 'tv_film': return '#b57d7d'     // Medium dusty rose
-      case 'other': return '#8f6666'       // Darkest dusty rose
+      case 'other': return '#d49d9d'       // Lighter dusty rose
       default: return theme.main
-    }
-  }
-
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'book': return 'Book'
-      case 'music': return 'Music'
-      case 'tv_film': return 'TV/Film'
-      case 'other': return 'Other'
-      default: return type
     }
   }
 
@@ -44,10 +37,9 @@ export function ArchivePage({ mediaItems, theme, onItemClick }: ArchivePageProps
       <div style={{
         textAlign: 'center',
         padding: '80px 20px',
-        color: '#a8a29e',
-        fontStyle: 'italic'
+        color: '#a8a29e'
       }}>
-        <div style={{ fontSize: '48px', marginBottom: '24px' }}>📚</div>
+        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📚</div>
         <div style={{ fontSize: '18px', fontFamily: 'serif' }}>
           Your archive is empty
         </div>
@@ -60,18 +52,7 @@ export function ArchivePage({ mediaItems, theme, onItemClick }: ArchivePageProps
 
   return (
     <div>
-      <h2 style={{ 
-        fontSize: '2rem', 
-        fontFamily: 'serif', 
-        color: theme.main, 
-        marginBottom: '32px' 
-      }}>
-        ARCHIVE TIMELINE
-      </h2>
-      
-      <div style={{ fontSize: '14px', color: '#a8a29e', marginBottom: '32px' }}>
-        {mediaItems.length} items 
-      </div>
+      {/* Remove both the header and the duplicate item count */}
 
       {Object.entries(groupedItems).map(([monthYear, items]) => (
         <div key={monthYear} style={{ marginBottom: '48px' }}>
@@ -100,122 +81,97 @@ export function ArchivePage({ mediaItems, theme, onItemClick }: ArchivePageProps
                 style={{
                   backgroundColor: 'white',
                   border: `2px solid ${theme.light}`,
-                  padding: '20px',
+                  padding: '24px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '20px'
+                  position: 'relative'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = theme.main
                   e.currentTarget.style.transform = 'translateY(-2px)'
-                  e.currentTarget.style.boxShadow = `0 4px 12px rgba(0,0,0,0.1)`
+                  e.currentTarget.style.boxShadow = `0 8px 32px rgba(192, 138, 138, 0.15)`
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = theme.light
                   e.currentTarget.style.transform = 'translateY(0)'
                   e.currentTarget.style.boxShadow = 'none'
                 }}
               >
-                {/* Type Indicator */}
+                {/* Type Badge */}
                 <div style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
                   backgroundColor: getTypeColor(item.type),
                   color: 'white',
-                  padding: '8px 12px',
+                  padding: '4px 12px',
                   fontSize: '11px',
                   fontFamily: 'monospace',
                   textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  fontWeight: 'bold',
-                  minWidth: '80px',
-                  textAlign: 'center'
+                  letterSpacing: '1px'
                 }}>
-                  {getTypeLabel(item.type)}
+                  {item.type === 'tv_film' ? 'TV/FILM' : item.type}
                 </div>
 
                 {/* Content */}
-                <div style={{ flex: 1 }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '8px'
+                <div style={{ paddingRight: '80px' }}>
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    margin: '0 0 8px 0',
+                    color: '#292524',
+                    fontFamily: 'serif'
                   }}>
-                    <h3 style={{
-                      fontSize: '18px',
-                      fontFamily: 'serif',
-                      margin: '0',
-                      color: '#292524',
-                      fontWeight: 'bold'
-                    }}>
-                      {item.title}
-                    </h3>
-                    <div style={{
-                      fontSize: '16px',
-                      color: theme.main,
-                      marginLeft: '16px'
-                    }}>
-                      {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
-                    </div>
-                  </div>
-
+                    {item.title}
+                  </h3>
+                  
                   {item.author_artist && (
-                    <div style={{
+                    <p style={{
                       fontSize: '14px',
                       color: '#57534e',
-                      marginBottom: '8px',
+                      margin: '0 0 12px 0',
                       fontFamily: 'monospace'
                     }}>
                       {item.author_artist}
-                    </div>
+                    </p>
                   )}
 
+                  {/* Rating */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{ color: getTypeColor(item.type), fontSize: '16px' }}>
+                      {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
+                    </div>
+                    {/* Remove the completed status completely */}
+                  </div>
+
+                  {/* Preview of review/notes */}
                   {item.review && (
-                    <div style={{
+                    <p style={{
                       fontSize: '14px',
                       color: '#44403c',
                       lineHeight: '1.5',
-                      marginBottom: '8px',
-                      fontFamily: 'monospace'
+                      margin: '0 0 12px 0',
+                      fontFamily: 'monospace',
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
                     }}>
-                      {item.review.length > 150 
-                        ? `${item.review.substring(0, 150)}...` 
-                        : item.review
-                      }
-                    </div>
+                      "{item.review}"
+                    </p>
                   )}
 
+                  {/* Date */}
                   <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
                     fontSize: '12px',
                     color: '#a8a29e',
                     fontFamily: 'monospace'
                   }}>
-                    <span>
-                      Added {new Date(item.added_date).toLocaleDateString()}
-                    </span>
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      {item.completed && (
-                        <span style={{ color: '#059669' }}>✓ Completed</span>
-                      )}
-                      {!item.is_public && (
-                        <span style={{ color: '#dc2626' }}>🔒 Private</span>
-                      )}
-                    </div>
+                    Added {new Date(item.added_date).toLocaleDateString()}
                   </div>
-                </div>
-
-                {/* Click indicator */}
-                <div style={{
-                  fontSize: '18px',
-                  color: '#a8a29e',
-                  marginLeft: '8px'
-                }}>
-                  →
                 </div>
               </div>
             ))}
