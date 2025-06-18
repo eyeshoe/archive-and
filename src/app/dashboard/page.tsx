@@ -232,17 +232,26 @@ export default function Dashboard() {
           </button>
           
           <button
-            disabled
+            onClick={() => window.location.href = '/settings'}
             style={{
               backgroundColor: theme.light,
-              border: `1px solid ${theme.light}`,
-              color: '#a8a29e',
+              border: `1px solid ${theme.main}`,
+              color: theme.main,
               padding: '10px 16px',
               fontSize: '11px',
               fontFamily: 'monospace',
-              cursor: 'not-allowed',
+              cursor: 'pointer',
               textTransform: 'uppercase',
-              letterSpacing: '1px'
+              letterSpacing: '1px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = theme.main
+              e.currentTarget.style.color = 'white'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = theme.light
+              e.currentTarget.style.color = theme.main
             }}
           >
             settings

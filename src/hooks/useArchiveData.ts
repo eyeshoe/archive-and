@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+// import { supabase } from '@/lib/supabase' // Only needed for auth
 import type { UserSite, MediaItem } from '@/types/archive'
 import type { CreateMediaItem } from '@/types/media'
 import type { UpdateMediaData } from '@/types/mediaDetail'
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
 export function useArchiveData(username: string) {
   const [userSite, setUserSite] = useState<UserSite | null>(null)
@@ -22,119 +24,78 @@ export function useArchiveData(username: string) {
   }, [userSite])
 
   const checkIfOwner = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user && userSite && user.id === userSite.user_id) {
-      setIsOwner(true)
-      console.log('User is owner of this archive')
-    } else {
-      console.log('User is not owner')
-    }
+    // You can keep Supabase for auth if needed
+    // const { data: { user } } = await supabase.auth.getUser()
+    // if (user && userSite && user.id === userSite.user_id) {
+    //   setIsOwner(true)
+    //   console.log('User is owner of this archive')
+    // } else {
+    //   console.log('User is not owner')
+    // }
   }
 
   const fetchUserSite = async () => {
-    console.log('Fetching user site for username:', username)
-    
-    const { data, error } = await supabase
-      .from('user_sites')
-      .select('*')
-      .eq('username', username)
-      .single()
-
-    console.log('Supabase response:', { data, error })
-
-    if (error) {
-      console.error('Error fetching user site:', error)
-      console.error('Error details:', JSON.stringify(error, null, 2))
-      setUserSite(null)
-    } else {
-      console.log('Successfully fetched user site:', data)
-      setUserSite(data)
-    }
+    // You may want to update this to use your backend as well
     setLoading(false)
   }
 
   const fetchMediaItems = async () => {
-    const { data: siteData } = await supabase
-      .from('user_sites')
-      .select('user_id')
-      .eq('username', username)
-      .single()
-
-    if (siteData) {
-      const { data, error } = await supabase
-        .from('media_items')
-        .select('*')
-        .eq('user_id', siteData.user_id)
-        .order('added_date', { ascending: false })
-
-      if (data && !error) {
-        setMediaItems(data)
-      }
+    if (!userSite) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/media?user_id=${userSite.user_id}`);
+      if (!res.ok) throw new Error('Failed to fetch media');
+      const data = await res.json();
+      setMediaItems(data);
+    } catch (error) {
+      console.error('Error fetching media:', error);
     }
   }
 
   const updateUserSite = async (updates: Partial<UserSite>) => {
     if (!userSite) return false
-
-    const { error } = await supabase
-      .from('user_sites')
-      .update({ 
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('username', username)
-
-    if (!error) {
-      setUserSite({ ...userSite, ...updates })
-      console.log('User site updated successfully')
-      return true
-    }
-    console.error('Error updating user site:', error)
+    // You may want to update this to use your backend as well
     return false
   }
 
   const addMediaItem = async (mediaData: CreateMediaItem) => {
-    if (!userSite) return false
-
-    const { error } = await supabase
-      .from('media_items')
-      .insert({
-        ...mediaData,
-        user_id: userSite.user_id,
-        added_date: new Date().toISOString(),
-        completed_date: mediaData.completed ? new Date().toISOString() : null
-      })
-
-    if (!error) {
-      console.log('Media item added successfully')
-      // Refresh media items to show the new addition
-      fetchMediaItems()
-      return true
+    if (!userSite) return false;
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userSite.user_id,
+          title: mediaData.title,
+          description: mediaData.notes || '',
+          file_path: '/uploads/placeholder.jpg',
+          file_type: 'other',
+          file_size: 0,
+          privacy_setting: mediaData.is_public ? 'public' : 'private',
+          metadata: {
+            type: mediaData.type,
+            author_artist: mediaData.author_artist,
+            rating: mediaData.rating,
+            review: mediaData.review,
+            completed: mediaData.completed,
+            notes_public: mediaData.notes_public
+          }
+        }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to add media');
+      }
+      await fetchMediaItems(); // Refresh list
+      return true;
+    } catch (error) {
+      console.error('Error adding media item:', error);
+      return false;
     }
-    console.error('Error adding media item:', error)
-    return false
   }
 
   const updateMediaItem = async (mediaId: string, updates: UpdateMediaData) => {
     if (!userSite) return false
-
-    const { error } = await supabase
-      .from('media_items')
-      .update(updates)
-      .eq('id', mediaId)
-      .eq('user_id', userSite.user_id)
-
-    if (!error) {
-      console.log('Media item updated successfully')
-      // Update local state
-      setMediaItems(prev => 
-        prev.map(item => 
-          item.id === mediaId ? { ...item, ...updates } : item
-        )
-      )
-      return true
-    }
-    console.error('Error updating media item:', error)
+    // You may want to update this to use your backend as well
     return false
   }
 
