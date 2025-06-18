@@ -1,22 +1,21 @@
 {
-  "name": "archive-and-backend",
+  "name": "archiveand-backend",
   "version": "1.0.0",
   "description": "Backend for Archive& application",
-  "main": "src/index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "init-db": "node src/db/init.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "init-db": "node db/init.js"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
+    "express-validator": "^7.0.1",
     "pg": "^8.11.3"
   },
   "devDependencies": {
-    "nodemon": "^3.0.3"
+    "nodemon": "^3.0.2"
   }
 } 

@@ -1,38 +1,35 @@
 'use client'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { auth } from '@/lib/api'
 
 interface LoginFormProps {
   onClose: () => void
 }
 
-export default function LoginForm({ onClose }: LoginFormProps) {
+export function LoginForm({ onClose }: LoginFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        alert(error.message)
-        return
+      const { data, error } = await auth.login(email, password)
+      if (error) throw new Error(error)
+      if (data?.token) {
+        localStorage.setItem('token', data.token)
+        onClose()
+        window.location.reload()
       }
-
-      // Redirect to dashboard after successful login
-      window.location.href = '/dashboard'
-    } catch (error) {
-      console.error('Login error:', error)
-      alert('An error occurred during login')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred during login')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -67,8 +64,10 @@ export default function LoginForm({ onClose }: LoginFormProps) {
         }}>
           log in to archive&
         </h2>
-        
-        <form onSubmit={handleLogin}>
+        {error && (
+          <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center', fontSize: '14px' }}>{error}</div>
+        )}
+        <form onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email"
@@ -86,7 +85,6 @@ export default function LoginForm({ onClose }: LoginFormProps) {
               boxSizing: 'border-box'
             }}
           />
-          
           <input
             type="password"
             placeholder="Password"
@@ -104,7 +102,6 @@ export default function LoginForm({ onClose }: LoginFormProps) {
               boxSizing: 'border-box'
             }}
           />
-          
           <div style={{ 
             display: 'flex', 
             gap: '12px',
@@ -126,7 +123,6 @@ export default function LoginForm({ onClose }: LoginFormProps) {
             >
               {loading ? 'logging in...' : 'log in'}
             </button>
-            
             <button
               type="button"
               onClick={onClose}

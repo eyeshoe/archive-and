@@ -1,46 +1,34 @@
 'use client'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { auth } from '@/lib/api'
 
 interface SignUpFormProps {
   onClose: () => void
 }
 
-export default function SignUpForm({ onClose }: SignUpFormProps) {
+export function SignUpForm({ onClose }: SignUpFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
   const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError(null)
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            phone,
-          }
-        }
-      })
-
-      if (error) {
-        alert(error.message)
-        return
-      }
-
+      const { error } = await auth.signup(email, password, username, phone)
+      if (error) throw new Error(error)
       alert('Sign up successful! Please check your email to confirm your account.')
       onClose()
-    } catch (error) {
-      console.error('Sign up error:', error)
-      alert('An error occurred during sign up')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred during sign up')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
@@ -75,8 +63,10 @@ export default function SignUpForm({ onClose }: SignUpFormProps) {
         }}>
           sign up for archive&
         </h2>
-        
-        <form onSubmit={handleSignUp}>
+        {error && (
+          <div style={{ color: 'red', marginBottom: '1rem', textAlign: 'center', fontSize: '14px' }}>{error}</div>
+        )}
+        <form onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email"
@@ -94,25 +84,6 @@ export default function SignUpForm({ onClose }: SignUpFormProps) {
               boxSizing: 'border-box'
             }}
           />
-          
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '16px',
-              marginBottom: '1rem',
-              border: '2px solid #a8a29e',
-              fontFamily: 'monospace',
-              fontSize: '14px',
-              backgroundColor: 'white',
-              boxSizing: 'border-box'
-            }}
-          />
-          
           <input
             type="tel"
             placeholder="Phone (optional)"
@@ -129,12 +100,28 @@ export default function SignUpForm({ onClose }: SignUpFormProps) {
               boxSizing: 'border-box'
             }}
           />
-          
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{
+              width: '100%',
+              padding: '16px',
+              marginBottom: '1rem',
+              border: '2px solid #a8a29e',
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              backgroundColor: 'white',
+              boxSizing: 'border-box'
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
             style={{
               width: '100%',
@@ -147,7 +134,6 @@ export default function SignUpForm({ onClose }: SignUpFormProps) {
               boxSizing: 'border-box'
             }}
           />
-          
           <div style={{ 
             display: 'flex', 
             gap: '12px',
@@ -169,7 +155,6 @@ export default function SignUpForm({ onClose }: SignUpFormProps) {
             >
               {loading ? 'creating...' : 'create account'}
             </button>
-            
             <button
               type="button"
               onClick={onClose}
